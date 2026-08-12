@@ -30,6 +30,7 @@ public class Tray {
         slides.stopAndResetEncoder();
 
         door = new ServoEx(hwMap, "Tray door"); //TODO maybe add range
+        door.setCachingTolerance(0.02);
     }
 
     public Command setUp = instant(() -> {

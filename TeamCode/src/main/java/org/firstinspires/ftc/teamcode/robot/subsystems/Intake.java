@@ -1,7 +1,9 @@
 package org.firstinspires.ftc.teamcode.robot.subsystems;
 
 import static com.pedropathing.ivy.commands.Commands.instant;
+import static com.pedropathing.ivy.commands.Commands.waitMs;
 import static com.pedropathing.ivy.groups.Groups.parallel;
+import static com.pedropathing.ivy.groups.Groups.sequential;
 
 import com.pedropathing.ivy.Command;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -64,8 +66,26 @@ public class Intake {
     )
             .requiring(this);
 
-    public Command toggleReversed = instant(() -> reversed = !reversed)
+    public Command reverse = instant(() -> reversed = true)
             .requiring(this);
+    public Command unreverse = instant(() -> reversed = false)
+            .requiring(this);
+
+    /**
+     * this prevents pollen from popping out the top when the tray is lifted
+     * TODO tune/remove this
+     */
+    public Command lowerPollen = sequential(
+            unreverse,
+            instant(() -> conveyorMotor.setInverted(true)),
+            startAll,
+            waitMs(500),
+            stopAll,
+            instant(() -> conveyorMotor.setInverted(false))
+    )
+            .requiring(this)
+            .setPriority(1);
+
 
     public void update(){
         if (conveyorMotor.isOverCurrent()){
