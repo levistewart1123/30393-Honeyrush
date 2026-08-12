@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.robot;
 
+import static com.pedropathing.ivy.commands.Commands.instant;
 import static com.pedropathing.ivy.commands.Commands.waitMs;
 import static com.pedropathing.ivy.commands.Commands.waitUntil;
 import static com.pedropathing.ivy.groups.Groups.sequential;
@@ -29,12 +30,13 @@ public class Robot {
     public boolean isRed;
     public Tray tray = new Tray();
     public Intake intake = new Intake();
+    private final double SLOW_MODE_MULTIPLIER = 0.2;
 
 
     public void initialize(boolean isRed, HardwareMap hwMap) {
         List<LynxModule> allHubs = hwMap.getAll(LynxModule.class);
         for (LynxModule hub : allHubs) {
-            hub.setBulkCachingMode(LynxModule.BulkCachingMode.AUTO); //we can try setting this to manual and see how much loop times improve
+            hub.setBulkCachingMode(LynxModule.BulkCachingMode.AUTO); //TODO try setting this to manual and see how much loop times improve
         }
 
         follower = Constants.createFollower(hwMap);
@@ -58,18 +60,29 @@ public class Robot {
     }
 
     public Command dump = sequential(
-        intake.stopAll,
-        tray.setUp,
-        waitUntil(() -> tray.isUp),
-        tray.open,
-        waitMs(2000),//TODO figure out how long it takes balls to exit
-        tray.close,
-        tray.setDown,
-        waitUntil(() -> tray.isDown),
-        intake.startAll
+            intake.stopAll,
+            instant(() -> slowDrive = true),
+            tray.setUp,
+            waitUntil(() -> tray.isUp),
+            tray.open,
+            waitMs(2000),//TODO figure out how long it takes balls to exit
+            tray.close,
+            instant(() -> slowDrive = false),
+            tray.setDown,
+            waitUntil(() -> tray.isDown)
     )
             .requiring(intake, tray)
             .setPriority(1);
+
+    public void drive(double forward, double strafe, double rotate){
+        if (!follower.isTeleopDrive()) follower.startTeleOpDrive();
+
+        if (slowDrive) {
+            follower.setTeleOpDrive(forward * SLOW_MODE_MULTIPLIER, strafe * SLOW_MODE_MULTIPLIER, rotate * SLOW_MODE_MULTIPLIER);
+        } else {
+            follower.setTeleOpDrive(forward, strafe, rotate);
+        }
+    }
 
 
 }

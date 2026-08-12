@@ -16,7 +16,7 @@ public class Intake {
     /**
      * if our motors are drawing above their current limit, their power is multiplied by this number
      */
-    private final double overCurrentSpeedMultiplier = 0.1;
+    private final double OVER_CURRENT_SPEED_MULTIPLIER = 0.1;
     private double rollerMult = 1;
     private double conveyorMult = 1;
     private boolean rollerOn = false;
@@ -69,12 +69,12 @@ public class Intake {
 
     public void update(){
         if (conveyorMotor.isOverCurrent()){
-            conveyorMult = overCurrentSpeedMultiplier;
+            conveyorMult = OVER_CURRENT_SPEED_MULTIPLIER;
         } else {
             conveyorMult = 1;
         }
         if (rollerMotor.isOverCurrent()){
-            rollerMult = overCurrentSpeedMultiplier;
+            rollerMult = OVER_CURRENT_SPEED_MULTIPLIER;
         } else {
             rollerMult = 1;
         }

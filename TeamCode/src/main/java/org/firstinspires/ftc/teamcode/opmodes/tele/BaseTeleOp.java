@@ -32,15 +32,18 @@ public class BaseTeleOp extends CommandOpMode {
 
     @Override
     public void loop() {
-        robot.follower.setTeleOpDrive(gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.right_stick_x); //may need to invert
-        if (gamepad1.aWasPressed()) {
-            robot.dump.schedule();
-        }
+        robot.drive(gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.right_stick_x); //may need to invert
+
+        if (gamepad1.aWasPressed()) robot.dump.schedule();
+
         if (gamepad1.right_trigger > 0.1){
             robot.intake.startAll.schedule();
         } else {
             robot.intake.stopAll.schedule();
         }
+
+        if (gamepad1.yWasPressed()) robot.slowDrive = true;
+
         robot.update();
         super.loop();
     }
@@ -49,4 +52,5 @@ public class BaseTeleOp extends CommandOpMode {
         PoseSaver.autoWasRun = false;
         super.stop();
     }
+
 }
