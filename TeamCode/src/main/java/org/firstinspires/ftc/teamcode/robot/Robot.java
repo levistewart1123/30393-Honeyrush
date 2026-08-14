@@ -34,7 +34,6 @@ public class Robot {
     public Tray tray = new Tray();
     public Intake intake = new Intake();
     private final double SLOW_MODE_MULTIPLIER = 0.2;
-    public boolean butterflyWheelsDown = false;
 
 
     public void initialize(boolean isRed, HardwareMap hwMap) {
@@ -46,6 +45,7 @@ public class Robot {
         follower = Constants.createFollower(hwMap);
         intake.initialize(hwMap);
         tray.initialize(hwMap);
+        drivetrain.initialize(hwMap);
 
         this.isRed = isRed;
         if (PoseSaver.autoWasRun) {
@@ -93,8 +93,9 @@ public class Robot {
         } else {
             drivetrain.drive(forward, turn);
         }
-
     }
+
+
 
 
 
