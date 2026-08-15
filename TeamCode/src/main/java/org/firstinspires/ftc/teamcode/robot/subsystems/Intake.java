@@ -71,6 +71,17 @@ public class Intake {
     public Command unreverse = instant(() -> reversed = false)
             .requiring(this);
 
+    public Command startReversed = parallel(
+            reverse,
+            startAll
+    )
+            .requiring(this);
+
+    public Command startNormal = parallel(
+            unreverse,
+            startAll
+    )
+            .requiring(this);
     /**
      * this prevents pollen from popping out the top when the tray is lifted
      * TODO tune/remove this
