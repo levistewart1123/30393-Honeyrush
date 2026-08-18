@@ -7,9 +7,13 @@ import static java.lang.Math.max;
 
 import com.pedropathing.ivy.Command;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.seattlesolvers.solverslib.hardware.motors.Motor;
 import com.seattlesolvers.solverslib.hardware.motors.MotorEx;
 import com.seattlesolvers.solverslib.hardware.servos.ServoEx;
+import com.seattlesolvers.solverslib.util.Timing;
+
+import java.util.concurrent.TimeUnit;
 
 /**
  * Uses butterfly wheels and a PTO (not implemented).
@@ -20,6 +24,7 @@ import com.seattlesolvers.solverslib.hardware.servos.ServoEx;
 public class Drivetrain {
     private MotorEx frontLeft, frontRight, backLeft, backRight;
     private ServoEx leftButterflyServo, rightButterflyServo, leftPto, rightPto;
+    private TouchSensor leftTouch, rightTouch, backTouch, frontTouch;
     private final double LEFT_WHEEL_UP_POS = 0,
             LEFT_WHEEL_DOWN_POS = 1,
             RIGHT_WHEEL_UP_POS = 0,
@@ -31,21 +36,16 @@ public class Drivetrain {
 
     public boolean wheelsUp = true;
     public boolean ptoEnabled = false;
+    private Timing.Timer lowerWhenUntouchedTimer = new Timing.Timer(500, TimeUnit.MILLISECONDS);
+    private boolean wasPressed = false;
 
 
     public void initialize(HardwareMap hwMap){
-        frontLeft = new MotorEx(hwMap, "Drivetrain frontLeft");
-        frontRight = new MotorEx(hwMap, "Drivetrain frontRight");
-        backLeft = new MotorEx(hwMap, "Drivetrain backLeft");
-        backRight = new MotorEx(hwMap, "Drivetrain backRight");
+        frontLeft = new MotorEx(hwMap, "Drivetrain frontLeft").setCachingTolerance(0.005);
+        frontRight = new MotorEx(hwMap, "Drivetrain frontRight").setCachingTolerance(0.005);
+        backLeft = new MotorEx(hwMap, "Drivetrain backLeft").setCachingTolerance(0.005);
+        backRight = new MotorEx(hwMap, "Drivetrain backRight").setCachingTolerance(0.005);
 
-        MotorEx[] motors = {frontLeft, frontRight, backLeft, backRight};
-
-        for (MotorEx motor: motors) {
-            motor.setCachingTolerance(0.005);
-            motor.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
-            motor.setRunMode(Motor.RunMode.RawPower);
-        }
         backLeft.setInverted(true);
         backRight.setInverted(true);
 
@@ -58,6 +58,26 @@ public class Drivetrain {
         rightPto = new ServoEx(hwMap, "Drivetrain rightPto")
                 .setCachingTolerance(0.01);
 
+        leftTouch = hwMap.get(TouchSensor.class, "Drivetrain leftTouch");
+        rightTouch = hwMap.get(TouchSensor.class, "Drivetrain rightTouch");
+        backTouch = hwMap.get(TouchSensor.class, "Drivetrain backTouch");
+        frontTouch = hwMap.get(TouchSensor.class, "Drivetrain frontTouch");
+    }
+
+    public boolean pressed(){
+        return (leftTouch.isPressed() || rightTouch.isPressed() || frontTouch.isPressed() || backTouch.isPressed());
+    }
+
+    public void update(){
+        if (lowerWhenUntouchedTimer.done()) liftButterflyWheels();
+
+        if (pressed()){
+            lowerButterflyWheels();
+            wasPressed = true;
+        } else {
+            if (wasPressed) lowerWhenUntouchedTimer.start();
+            wasPressed = false;
+        }
     }
 
     public void drive(double forward, double turn){
@@ -76,14 +96,18 @@ public class Drivetrain {
     }
 
     public void liftButterflyWheels(){
-        leftButterflyServo.set(LEFT_WHEEL_UP_POS);
-        rightButterflyServo.set(RIGHT_WHEEL_UP_POS);
-        wheelsUp = true;
+        if (!wheelsUp) {
+            leftButterflyServo.set(LEFT_WHEEL_UP_POS);
+            rightButterflyServo.set(RIGHT_WHEEL_UP_POS);
+            wheelsUp = true;
+        }
     }
     public void lowerButterflyWheels(){
-        leftButterflyServo.set(LEFT_WHEEL_DOWN_POS);
-        rightButterflyServo.set(RIGHT_WHEEL_DOWN_POS);
-        wheelsUp = false;
+        if (wheelsUp) {
+            leftButterflyServo.set(LEFT_WHEEL_DOWN_POS);
+            rightButterflyServo.set(RIGHT_WHEEL_DOWN_POS);
+            wheelsUp = false;
+        }
     }
 
     public void enablePto(){

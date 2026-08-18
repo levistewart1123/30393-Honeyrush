@@ -9,6 +9,8 @@ import org.firstinspires.ftc.teamcode.robot.Robot;
 /**
  *This is our base TeleOp class.
  * Red and Blue TeleOps that extend this should be created and put on the driver station.
+ *
+ * @author Levi
  */
 public class BaseTeleOp extends CommandOpMode {
     protected Robot robot = new Robot();

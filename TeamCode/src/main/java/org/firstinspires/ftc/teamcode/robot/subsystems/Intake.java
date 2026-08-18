@@ -12,6 +12,9 @@ import com.seattlesolvers.solverslib.hardware.motors.MotorEx;
 
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 
+/**
+ * intake subsystem with separate roller and conveyor belt motors.
+ */
 public class Intake {
     private MotorEx rollerMotor;
     private MotorEx conveyorMotor;

@@ -11,6 +11,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * This is the base class that all OpModes we make should extend.
  * It automatically logs loop times and runs the scheduler.
+ * @author Levi
  */
 public class CommandOpMode extends OpMode {
     protected double loops = 0;
@@ -23,7 +24,7 @@ public class CommandOpMode extends OpMode {
     }
 
     /**
-     * Schedules objects to the scheduler
+     * Schedules commands to the scheduler
      */
     public void schedule(Command... commands) {
         Scheduler.schedule(commands);
