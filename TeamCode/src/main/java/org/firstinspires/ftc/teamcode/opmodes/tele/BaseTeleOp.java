@@ -35,7 +35,7 @@ public class BaseTeleOp extends CommandOpMode {
     @Override
     public void loop() {
         if (!robot.drivetrain.ptoEnabled) {
-            robot.drive(gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.right_stick_x); //may need to invert
+            robot.drivetrain.drive(gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.right_stick_x); //may need to invert
         }
 
         if (gamepad1.aWasPressed()) robot.dump.schedule();
@@ -48,10 +48,15 @@ public class BaseTeleOp extends CommandOpMode {
             robot.intake.stopAll.schedule();
         }
 
-        if (gamepad1.yWasPressed()) robot.slowDrive = true;
+        if (gamepad1.yWasPressed()) robot.drivetrain.slowDrive = true;
 
-        if (gamepad1.leftBumperWasPressed()) robot.drivetrain.liftButterflyWheels();
-        if (gamepad1.rightBumperWasPressed()) robot.drivetrain.lowerButterflyWheels();
+        if (gamepad1.left_bumper) {
+            robot.drivetrain.liftButterflyWheels();
+        } else if (gamepad1.right_bumper) {
+            robot.drivetrain.lowerButterflyWheels();
+        } else {
+            robot.drivetrain.autoLift();
+        }
 
         if (gamepad1.rightStickButtonWasPressed()) robot.drivetrain.runPto.schedule();
 
