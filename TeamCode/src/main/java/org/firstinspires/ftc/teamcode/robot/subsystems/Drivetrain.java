@@ -30,8 +30,6 @@ import java.util.concurrent.TimeUnit;
  */
 public class Drivetrain {
     private MotorEx frontLeft, frontRight, backLeft, backRight;
-    private ServoEx leftButterflyServo, rightButterflyServo, leftPto, rightPto;
-    private TouchSensor leftTouch, rightTouch, backTouch, frontTouch;
     private final double LEFT_WHEEL_UP_POS = 0,
             LEFT_WHEEL_DOWN_POS = 1,
             RIGHT_WHEEL_UP_POS = 0,
@@ -64,19 +62,6 @@ public class Drivetrain {
         backLeft.setInverted(true);
         backRight.setInverted(true);
 
-        leftButterflyServo = new ServoEx(hwMap, "Drivetrain leftButterflyServo")
-                .setCachingTolerance(0.01);
-        rightButterflyServo = new ServoEx(hwMap, "Drivetrain rightButterflyServo")
-                .setCachingTolerance(0.01);
-        leftPto = new ServoEx(hwMap, "Drivetrain leftPto")
-                .setCachingTolerance(0.01);
-        rightPto = new ServoEx(hwMap, "Drivetrain rightPto")
-                .setCachingTolerance(0.01);
-
-        leftTouch = hwMap.get(TouchSensor.class, "Drivetrain leftTouch");
-        rightTouch = hwMap.get(TouchSensor.class, "Drivetrain rightTouch");
-        backTouch = hwMap.get(TouchSensor.class, "Drivetrain backTouch");
-        frontTouch = hwMap.get(TouchSensor.class, "Drivetrain frontTouch");
         follower = Constants.createFollower(hwMap);
     }
 
@@ -155,10 +140,10 @@ public class Drivetrain {
 
     public void autoLift(){
         Map<Side, Boolean> sensorStates = new HashMap<>();
-        sensorStates.put(Side.FRONT, frontTouch.isPressed());
-        sensorStates.put(Side.RIGHT, rightTouch.isPressed());
-        sensorStates.put(Side.BACK,  backTouch.isPressed());
-        sensorStates.put(Side.LEFT,  leftTouch.isPressed());
+        sensorStates.put(Side.FRONT, false);
+        sensorStates.put(Side.RIGHT, false);
+        sensorStates.put(Side.BACK,  false);
+        sensorStates.put(Side.LEFT,  false);
 
         if (hasUnexpectedPressedSensor(sensorStates)){
             lowerButterflyWheels();
@@ -238,29 +223,21 @@ public class Drivetrain {
 
     public void liftButterflyWheels(){
         if (!wheelsUp) {
-            leftButterflyServo.set(LEFT_WHEEL_UP_POS);
-            rightButterflyServo.set(RIGHT_WHEEL_UP_POS);
             wheelsUp = true;
         }
     }
     public void lowerButterflyWheels(){
         if (wheelsUp) {
-            leftButterflyServo.set(LEFT_WHEEL_DOWN_POS);
-            rightButterflyServo.set(RIGHT_WHEEL_DOWN_POS);
             wheelsUp = false;
         }
     }
 
     public void enablePto(){
         liftButterflyWheels();
-        leftPto.set(LEFT_PTO_IN_POS);
-        rightPto.set(RIGHT_PTO_IN_POS);
         ptoEnabled = true;
     }
 
     public void disablePto(){
-        leftPto.set(LEFT_PTO_OUT_POS);
-        rightPto.set(RIGHT_PTO_OUT_POS);
         ptoEnabled = false;
     }
 
