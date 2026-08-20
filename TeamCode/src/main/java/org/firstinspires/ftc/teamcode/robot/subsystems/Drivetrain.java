@@ -47,8 +47,9 @@ public class Drivetrain {
     public Follower follower;
     public boolean slowDrive = false;
     private final double SLOW_MODE_MULTIPLIER = 0.2;
-    public static final double FIELD_SIZE = 144; // inches — adjust to your field
-    public static final double WALL_MARGIN = 2;  // same threshold as your snippet
+    private final double FIELD_SIZE = 144; // inches — adjust to your field
+    private final double WALL_MARGIN = 2;  // same threshold as your snippet
+    private final double BUMP_MIN_X = 47.75, BUMP_MIN_Y = 53, BUMP_MAX_X = 96.25, BUMP_MAX_Y = 91;
 
     public enum Side { FRONT, RIGHT, BACK, LEFT }
 

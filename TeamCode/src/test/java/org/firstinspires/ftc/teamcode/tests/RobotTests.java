@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.pedropathing.geometry.Pose;
+import com.pedropathing.math.Vector;
 
 import org.firstinspires.ftc.teamcode.robot.subsystems.Drivetrain;
 import org.junit.jupiter.api.Test;
@@ -121,5 +122,49 @@ public class RobotTests {
         }
         return corners;
     }
+
+    public Vector getFieldRelativeMovement(double forward, double strafe, double heading) {
+        double cos = Math.cos(heading);
+        double sin = Math.sin(heading);
+
+        double fieldX = forward * cos - strafe * sin;
+        double fieldY = forward * sin + strafe * cos;
+
+        Vector movement = new Vector();
+        movement.setOrthogonalComponents(fieldX, fieldY);
+        return movement;
+    }
+
+    public Vector getRobotRelativeMovement(Vector fieldMovement, double heading) {
+        double fieldX = fieldMovement.getXComponent();
+        double fieldY = fieldMovement.getYComponent();
+
+        double cos = Math.cos(heading);
+        double sin = Math.sin(heading);
+
+        // Inverse rotation (rotate by -heading)
+        double localForward = fieldX * cos + fieldY * sin;
+        double localStrafe  = -fieldX * sin + fieldY * cos;
+
+        Vector local = new Vector();
+        local.setOrthogonalComponents(localForward, localStrafe);
+        return local;
+    }
+
+    public void drive(){
+        double forward = 1, strafe = 0,  turn = 0;
+        Pose botPose = new Pose(72, 40, 45);
+        if (false) {
+            forward *= 0.2;
+            strafe *= 0.2;
+            turn *= 0.2;
+        }
+
+
+    }
+
+//    public boolean isCloseToBump(){
+//
+//    }
 
 }
