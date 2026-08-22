@@ -4,6 +4,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import static java.lang.Math.toRadians;
+
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.math.Vector;
 
@@ -153,7 +155,7 @@ public class RobotTests {
     @Test
     public void drive(){
         double forward = 1, strafe = 0,  turn = 0;
-        Pose botPose = new Pose(72, 39, 45);
+        Pose botPose = new Pose(72, 39, toRadians(45));
         if (false) {
             forward *= 0.2;
             strafe *= 0.2;
@@ -175,11 +177,12 @@ public class RobotTests {
             if (getClosestCorner(botPose).getY() > (BUMP_MIN_Y - MARGIN) && getClosestCorner(botPose).getY() < BUMP_MIN_Y){
                 y = -0.5;
             } else if (getClosestCorner(botPose).getY() < (BUMP_MAX_Y + MARGIN) && getClosestCorner(botPose).getY() > BUMP_MAX_Y) {
-                y = -0.5;
+                y = 0.5;
             }
             movement.setOrthogonalComponents(x, y);
-            forward = getRobotRelativeMovement(movement, turn).getXComponent();
-            strafe = getRobotRelativeMovement(movement, turn).getYComponent();
+            forward = getRobotRelativeMovement(movement, botPose.getHeading()).getXComponent();
+            strafe = getRobotRelativeMovement(movement, botPose.getHeading()).getYComponent();
+            assertEquals(-0.5, getFieldRelativeMovement(forward, strafe, botPose.getHeading()).getYComponent());
         }
     }
 
