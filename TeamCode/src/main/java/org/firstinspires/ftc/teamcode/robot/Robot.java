@@ -44,9 +44,9 @@ public class Robot {
 
         this.isRed = isRed;
         if (PoseSaver.autoWasRun) {
-            drivetrain.setStartingPose(PoseSaver.endPose);
+//            drivetrain.setStartingPose(PoseSaver.endPose);
         } else {
-            drivetrain.setStartingPose(new Pose(10, 10, 0));
+//            drivetrain.setStartingPose(new Pose(10, 10, 0));
         }
         PoseSaver.autoWasRun = false;
     }

@@ -5,6 +5,7 @@ import static com.pedropathing.ivy.commands.Commands.waitMs;
 import static com.pedropathing.ivy.groups.Groups.sequential;
 import static java.lang.Math.max;
 
+import com.bylazar.configurables.annotations.Configurable;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.ivy.Command;
@@ -28,23 +29,26 @@ import java.util.concurrent.TimeUnit;
  * For mecanum and any path following, use pedropathing and make sure the wheels are up.
  *
  */
+@Configurable
 public class Drivetrain {
     private MotorEx frontLeft, frontRight, backLeft, backRight;
-    private final double LEFT_WHEEL_UP_POS = 0,
+    private ServoEx leftButter, rightButter;
+    public static double
+            LEFT_WHEEL_UP_POS = 0,
             LEFT_WHEEL_DOWN_POS = 1,
-            RIGHT_WHEEL_UP_POS = 0,
-            RIGHT_WHEEL_DOWN_POS = 1,
+            RIGHT_WHEEL_UP_POS = 0.8, //tuned
+            RIGHT_WHEEL_DOWN_POS = 1, //tuned
             RIGHT_PTO_OUT_POS = 1,
             RIGHT_PTO_IN_POS = 0,
             LEFT_PTO_OUT_POS = 1,
             LEFT_PTO_IN_POS = 0;
 
-    public boolean wheelsUp = true;
+    public boolean wheelsUp = false;
     public boolean ptoEnabled = false;
     private Timing.Timer lowerWhenUntouchedTimer = new Timing.Timer(500, TimeUnit.MILLISECONDS);
     private boolean wasPressed = false;
-    private final double WIDTH = 17, LENGTH = 17;
-    public Follower follower;
+    private final double WIDTH = 17.7, LENGTH = 17.7;
+//    public Follower follower;
     public boolean slowDrive = false;
     private final double SLOW_MODE_MULTIPLIER = 0.2;
     private final double FIELD_SIZE = 144; // inches — adjust to your field
@@ -63,20 +67,23 @@ public class Drivetrain {
         backLeft.setInverted(true);
         backRight.setInverted(true);
 
-        follower = Constants.createFollower(hwMap);
+        leftButter = new ServoEx(hwMap, "Drivetrain leftButter");
+        rightButter = new ServoEx(hwMap, "Drivetrain rightButter");
+
+//        follower = Constants.createFollower(hwMap);
     }
 
     public void update(){
-        follower.update();
-        if (follower.isBusy()) liftButterflyWheels();
+//        follower.update();
+//        if (follower.isBusy()) liftButterflyWheels();
     }
 
-    public void setPose(Pose pose){
-        follower.setPose(pose);
-    }
-    public void setStartingPose(Pose pose){
-        follower.setStartingPose(pose);
-    }
+//    public void setPose(Pose pose){
+//        follower.setPose(pose);
+//    }
+//    public void setStartingPose(Pose pose){
+//        follower.setStartingPose(pose);
+//    }
 
 
 
@@ -94,7 +101,7 @@ public class Drivetrain {
     public Set<Side> getExpectedTouchedSides() {
         Set<Side> touchedSides = new HashSet<>();
         Pose[] corners = getRobotCorners();
-        double heading = follower.getPose().getHeading();
+        double heading = /*follower.getPose().getHeading()*/0;
 
         double frontNx = Math.cos(heading),  frontNy = Math.sin(heading);
         double rightNx = Math.sin(heading),  rightNy = -Math.cos(heading);
@@ -177,12 +184,12 @@ public class Drivetrain {
             strafe *= SLOW_MODE_MULTIPLIER;
             turn *= SLOW_MODE_MULTIPLIER;
         }
-        if (wheelsUp) {
-            if (!follower.isTeleopDrive()) follower.startTeleOpDrive();
-            follower.setTeleOpDrive(forward, strafe, turn);
-        } else {
+//        if (wheelsUp) {
+//            if (!follower.isTeleopDrive()) follower.startTeleOpDrive();
+//            follower.setTeleOpDrive(forward, strafe, turn);
+//        } else {
             driveButterfly(forward, turn);
-        }
+        //}
     }
 
     /**
@@ -191,7 +198,7 @@ public class Drivetrain {
      * @return the poses of the corners
      */
     public Pose[] getRobotCorners() {
-        Pose robotPose = follower.getPose();
+        Pose robotPose = new Pose()/*follower.getPose()*/;
         double half = 9.0; // half of 18 inches
         double x = robotPose.getX();
         double y = robotPose.getY();
@@ -225,11 +232,15 @@ public class Drivetrain {
     public void liftButterflyWheels(){
         if (!wheelsUp) {
             wheelsUp = true;
+            leftButter.set(LEFT_WHEEL_UP_POS);
+            rightButter.set(RIGHT_WHEEL_UP_POS);
         }
     }
     public void lowerButterflyWheels(){
         if (wheelsUp) {
             wheelsUp = false;
+            leftButter.set(LEFT_WHEEL_DOWN_POS);
+            rightButter.set(RIGHT_WHEEL_DOWN_POS);
         }
     }
 
