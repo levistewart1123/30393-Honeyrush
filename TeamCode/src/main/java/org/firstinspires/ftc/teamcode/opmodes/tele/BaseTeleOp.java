@@ -28,6 +28,7 @@ public class BaseTeleOp extends CommandOpMode {
 
     @Override
     public void start() {
+        robot.startup();
         robot.update();
         super.start();
     }
@@ -55,7 +56,7 @@ public class BaseTeleOp extends CommandOpMode {
         } else if (gamepad1.right_bumper) {
             robot.drivetrain.lowerButterflyWheels();
         } else {
-            robot.drivetrain.autoLift();
+            robot.drivetrain.autoLiftTouchSensor();
         }
 
         if (gamepad1.rightStickButtonWasPressed()) robot.drivetrain.runPto.schedule();

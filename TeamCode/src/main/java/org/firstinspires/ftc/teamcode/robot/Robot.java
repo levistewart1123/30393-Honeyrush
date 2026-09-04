@@ -51,6 +51,10 @@ public class Robot {
         PoseSaver.autoWasRun = false;
     }
 
+    public void startup(){
+        drivetrain.liftButterflyWheels();
+    }
+
     /**
      * updates everything and lifts butterfly wheels if a path is being followed (will likely be changed)
      */

@@ -6,16 +6,12 @@ import static com.pedropathing.ivy.groups.Groups.sequential;
 import static java.lang.Math.max;
 
 import com.bylazar.configurables.annotations.Configurable;
-import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.ivy.Command;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.seattlesolvers.solverslib.hardware.motors.MotorEx;
 import com.seattlesolvers.solverslib.hardware.servos.ServoEx;
 import com.seattlesolvers.solverslib.util.Timing;
-
-import org.firstinspires.ftc.teamcode.robot.pedroPathing.Constants;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -41,7 +37,8 @@ public class Drivetrain {
             RIGHT_PTO_OUT_POS = 1,
             RIGHT_PTO_IN_POS = 0,
             LEFT_PTO_OUT_POS = 1,
-            LEFT_PTO_IN_POS = 0;
+            LEFT_PTO_IN_POS = 0,
+            MAX_ACCEL = 10; //tune this
 
     public boolean wheelsUp = false;
     public boolean ptoEnabled = false;
@@ -54,6 +51,7 @@ public class Drivetrain {
     private final double FIELD_SIZE = 144; // inches — adjust to your field
     private final double WALL_MARGIN = 2;  // same threshold as your snippet
     private final double BUMP_MIN_X = 47.75, BUMP_MIN_Y = 53, BUMP_MAX_X = 96.25, BUMP_MAX_Y = 91;
+    private double previousVelocity = 0;
 
     public enum Side { FRONT, RIGHT, BACK, LEFT }
 
@@ -146,7 +144,7 @@ public class Drivetrain {
         return false;
     }
 
-    public void autoLift(){
+    public void autoLiftTouchSensor(){
         Map<Side, Boolean> sensorStates = new HashMap<>();
         sensorStates.put(Side.FRONT, false);
         sensorStates.put(Side.RIGHT, false);
@@ -162,6 +160,19 @@ public class Drivetrain {
             wasPressed = false;
         }
     }
+
+    public void autoLiftVelocityMatch(double loopTime){
+        if (false/*(follower.getVelocity.getMagnitude() - previousVelocity)/loopTime < MAX_ACCEL * */){
+            lowerButterflyWheels();
+            wasPressed = true;
+        } else {
+            if (lowerWhenUntouchedTimer.done()) liftButterflyWheels();
+            if (wasPressed) lowerWhenUntouchedTimer.start();
+            wasPressed = false;
+        }
+        /*previousVelocity = follower.getVelocity.getMagnitude();*/
+    } //not done, probably won't be used
+
 
     public void driveButterfly(double forward, double turn){
         double left = forward + turn;
