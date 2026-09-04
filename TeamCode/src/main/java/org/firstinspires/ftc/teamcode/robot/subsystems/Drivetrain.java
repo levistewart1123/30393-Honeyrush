@@ -27,7 +27,7 @@ import java.util.concurrent.TimeUnit;
  */
 @Configurable
 public class Drivetrain {
-    private MotorEx frontLeft, frontRight, backLeft, backRight;
+    public MotorEx frontLeft, frontRight, backLeft, backRight;
     private ServoEx leftButter, rightButter;
     public static double
             LEFT_WHEEL_UP_POS = 0,
@@ -62,8 +62,8 @@ public class Drivetrain {
         backLeft = new MotorEx(hwMap, "Drivetrain backLeft").setCachingTolerance(0.005);
         backRight = new MotorEx(hwMap, "Drivetrain backRight").setCachingTolerance(0.005);
 
+        frontLeft.setInverted(true);
         backLeft.setInverted(true);
-        backRight.setInverted(true);
 
         leftButter = new ServoEx(hwMap, "Drivetrain leftButter");
         rightButter = new ServoEx(hwMap, "Drivetrain rightButter");
@@ -175,8 +175,8 @@ public class Drivetrain {
 
 
     public void driveButterfly(double forward, double turn){
-        double left = forward + turn;
-        double right = forward - turn;
+        double left = -forward + turn;
+        double right = -forward - turn;
         double largest = max(left, right);
         if (largest > 1){
             left /= largest;
@@ -286,4 +286,22 @@ public class Drivetrain {
                 backRight.set(0);
             })
     );
+
+    public void setIndividualPowers(int which, double power){
+        if (which == 1){
+            frontRight.set(power);
+        }
+
+        if (which == 2){
+            frontLeft.set(power);
+        }
+
+        if (which == 3){
+            backRight.set(power);
+        }
+
+        if (which == 4){
+            backLeft.set(power);
+        }
+    }
 }
