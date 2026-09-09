@@ -17,7 +17,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
  */
 public class Intake {
     private MotorEx rollerMotor;
-    private MotorEx conveyorMotor;
+    private MotorEx transferMotor;
     /**
      * if our motors are drawing above their current limit, their power is multiplied by this number
      */
@@ -29,12 +29,12 @@ public class Intake {
     private boolean reversed = false;
 
     public void initialize(HardwareMap hwMap){
-        rollerMotor = new MotorEx(hwMap, "Intake rollerMotor", Motor.GoBILDA.RPM_1150);
-        conveyorMotor = new MotorEx(hwMap, "Intake conveyorMotor", Motor.GoBILDA.RPM_1150);
+        rollerMotor = new MotorEx(hwMap, "Intake rollerMotor", Motor.GoBILDA.BARE);
+        transferMotor = new MotorEx(hwMap, "Intake transferMotor", Motor.GoBILDA.RPM_1150);
         rollerMotor.setCachingTolerance(0.01);
-        conveyorMotor.setCachingTolerance(0.01);
+        transferMotor.setCachingTolerance(0.01);
         rollerMotor.setCurrentAlert(100, CurrentUnit.AMPS); //TODO tune this to a reasonable value
-        conveyorMotor.setCurrentAlert(100, CurrentUnit.AMPS);
+        transferMotor.setCurrentAlert(100, CurrentUnit.AMPS);
     }
 
     public Command startRoller = instant(() -> {
@@ -91,18 +91,18 @@ public class Intake {
      */
     public Command lowerPollen = sequential(
             unreverse,
-            instant(() -> conveyorMotor.setInverted(true)),
+            instant(() -> transferMotor.setInverted(true)),
             startAll,
             waitMs(500),
             stopAll,
-            instant(() -> conveyorMotor.setInverted(false))
+            instant(() -> transferMotor.setInverted(false))
     )
             .requiring(this)
             .setPriority(1);
 
 
     public void update(){
-        if (conveyorMotor.isOverCurrent()){
+        if (transferMotor.isOverCurrent()){
             conveyorMult = OVER_CURRENT_SPEED_MULTIPLIER;
         } else {
             conveyorMult = 1;
@@ -119,7 +119,7 @@ public class Intake {
 
         //TODO double check if not checking if the new power is different increases loop times
         if (conveyorOn){
-            conveyorMotor.set(1 * conveyorMult);
+            transferMotor.set(1 * conveyorMult);
         }
         if (rollerOn){
             rollerMotor.set(1 * rollerMult);
