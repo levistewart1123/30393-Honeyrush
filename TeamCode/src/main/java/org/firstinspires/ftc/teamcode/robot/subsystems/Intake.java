@@ -17,24 +17,25 @@ import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
  */
 public class Intake {
     private MotorEx rollerMotor;
-    private MotorEx transferMotor;
+//    private MotorEx transferMotor;
     /**
      * if our motors are drawing above their current limit, their power is multiplied by this number
      */
     private final double OVER_CURRENT_SPEED_MULTIPLIER = 0.1;
-    private double rollerMult = 1;
-    private double conveyorMult = 1;
     private boolean rollerOn = false;
-    private boolean conveyorOn = false;
+    private boolean transferOn = false;
     private boolean reversed = false;
+    double rollerPower = 0, transferPower = 0;
+
 
     public void initialize(HardwareMap hwMap){
         rollerMotor = new MotorEx(hwMap, "Intake rollerMotor", Motor.GoBILDA.BARE);
-        transferMotor = new MotorEx(hwMap, "Intake transferMotor", Motor.GoBILDA.RPM_1150);
+        rollerMotor.setInverted(true);
+//        transferMotor = new MotorEx(hwMap, "Intake transferMotor", Motor.GoBILDA.RPM_1150);
         rollerMotor.setCachingTolerance(0.01);
-        transferMotor.setCachingTolerance(0.01);
-        rollerMotor.setCurrentAlert(100, CurrentUnit.AMPS); //TODO tune this to a reasonable value
-        transferMotor.setCurrentAlert(100, CurrentUnit.AMPS);
+//        transferMotor.setCachingTolerance(0.01);
+//        rollerMotor.setCurrentAlert(100, CurrentUnit.AMPS); //TODO tune this to a reasonable value
+//        transferMotor.setCurrentAlert(100, CurrentUnit.AMPS);
     }
 
     public Command startRoller = instant(() -> {
@@ -48,12 +49,12 @@ public class Intake {
             .requiring(this);
 
     public Command startConveyor = instant(() -> {
-        conveyorOn = true;
+        transferOn = true;
     })
             .requiring(this);
 
     public Command stopConveyor = instant(() -> {
-        conveyorOn = false;
+        transferOn = false;
     })
             .requiring(this);
 
@@ -91,39 +92,38 @@ public class Intake {
      */
     public Command lowerPollen = sequential(
             unreverse,
-            instant(() -> transferMotor.setInverted(true)),
+//            instant(() -> transferMotor.setInverted(true)),
             startAll,
             waitMs(500),
-            stopAll,
-            instant(() -> transferMotor.setInverted(false))
+            stopAll//,
+//            instant(() -> transferMotor.setInverted(false))
     )
             .requiring(this)
             .setPriority(1);
 
 
-    public void update(){
-        if (transferMotor.isOverCurrent()){
-            conveyorMult = OVER_CURRENT_SPEED_MULTIPLIER;
-        } else {
-            conveyorMult = 1;
-        }
-        if (rollerMotor.isOverCurrent()){
-            rollerMult = OVER_CURRENT_SPEED_MULTIPLIER;
-        } else {
-            rollerMult = 1;
-        }
-        if (reversed){
-            conveyorMult *= -1;
-            rollerMult *= -1;
-        }
+    public void setPowers(double rollerPower, double transferPower){
+        this.rollerPower = rollerPower;
+        this.transferPower = transferPower;
+    }
 
-        //TODO double check if not checking if the new power is different increases loop times
-        if (conveyorOn){
-            transferMotor.set(1 * conveyorMult);
-        }
-        if (rollerOn){
-            rollerMotor.set(1 * rollerMult);
-        }
+    /**
+     * unfinished but works
+     */
+    public void update(){
+////        if (transferMotor.isOverCurrent()){
+//            conveyorMult = OVER_CURRENT_SPEED_MULTIPLIER;
+//        } else {
+//            conveyorMult = 1;
+//        }
+//        if (rollerMotor.isOverCurrent()){
+//            rollerMult = OVER_CURRENT_SPEED_MULTIPLIER;
+//        } else {
+//            rollerMult = 1;
+//        }
+
+        rollerMotor.set(rollerPower);
+//        transferMotor.set(transferPower);
     }
 
 

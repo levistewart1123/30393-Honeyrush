@@ -199,7 +199,8 @@ public class Drivetrain {
 //            if (!follower.isTeleopDrive()) follower.startTeleOpDrive();
 //            follower.setTeleOpDrive(forward, strafe, turn);
 //        } else {
-            driveButterfly(forward, turn);
+//            driveButterfly(forward, turn);
+        driveStrafe(forward, strafe, turn);
         //}
     }
 
@@ -303,5 +304,33 @@ public class Drivetrain {
         if (which == 4){
             backLeft.set(power);
         }
+    }
+
+    public void driveStrafe(double forward, double right, double rotate) {
+        // This calculates the power needed for each wheel based on the amount of forward,
+        // strafe right, and rotate
+        double frontLeftPower = forward + right + rotate;
+        double frontRightPower = forward - right - rotate;
+        double backRightPower = forward + right - rotate;
+        double backLeftPower = forward - right + rotate;
+
+        double maxPower = 1.0;
+        double maxSpeed = 1.0;  // make this slower for outreaches
+
+        // This is needed to make sure we don't pass > 1.0 to any wheel
+        // It allows us to keep all the motors in proportion to what they should
+        // be and not get clipped
+        maxPower = Math.max(maxPower, Math.abs(frontLeftPower));
+        maxPower = Math.max(maxPower, Math.abs(frontRightPower));
+        maxPower = Math.max(maxPower, Math.abs(backRightPower));
+        maxPower = Math.max(maxPower, Math.abs(backLeftPower));
+
+        // We multiply by maxSpeed so that it can be set lower for outreaches
+        // When a young child is driving the robot, we may not want to allow full
+        // speed.
+        frontLeft.set(maxSpeed * (frontLeftPower / maxPower));
+        frontRight.set(maxSpeed * (frontRightPower / maxPower));
+        backLeft.set(maxSpeed * (backLeftPower / maxPower));
+        backRight.set(maxSpeed * (backRightPower / maxPower));
     }
 }

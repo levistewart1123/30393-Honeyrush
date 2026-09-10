@@ -41,13 +41,13 @@ public class BaseTeleOp extends CommandOpMode {
 
         if (gamepad1.aWasPressed()) robot.dump.schedule();
 
+        double intakePower = 0;
         if (gamepad1.right_trigger > 0.1){
-            robot.intake.startNormal.schedule();
+            intakePower = 1;
         } else if (gamepad1.left_trigger > 0.1) {
-            robot.intake.startReversed.schedule();
-        } else {
-            robot.intake.stopAll.schedule();
+            intakePower = -1;
         }
+        robot.intake.setPowers(intakePower, 0);
 
         if (gamepad1.yWasPressed()) robot.drivetrain.slowDrive = true;
 
