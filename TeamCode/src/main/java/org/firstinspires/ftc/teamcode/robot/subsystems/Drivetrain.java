@@ -30,10 +30,10 @@ public class Drivetrain {
     public MotorEx frontLeft, frontRight, backLeft, backRight;
     private ServoEx leftButter, rightButter;
     public static double
-            LEFT_WHEEL_UP_POS = 0,
-            LEFT_WHEEL_DOWN_POS = 1,
-            RIGHT_WHEEL_UP_POS = 0.8, //tuned
-            RIGHT_WHEEL_DOWN_POS = 1, //tuned
+            LEFT_WHEEL_UP_POS = 0.925,
+            LEFT_WHEEL_DOWN_POS = 0.825,
+            RIGHT_WHEEL_UP_POS = 0.85,
+            RIGHT_WHEEL_DOWN_POS = 0.95,
             RIGHT_PTO_OUT_POS = 1,
             RIGHT_PTO_IN_POS = 0,
             LEFT_PTO_OUT_POS = 1,
